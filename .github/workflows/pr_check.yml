@@ -1,0 +1,30 @@
+name: PR check
+
+on:
+  pull_request:
+
+jobs:
+  upload:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Run test cases
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: |
+          echo "Run test cases and produce files for sonar"
+          echo "secrets cannot be accessed here by a PR from a forked Repo"
+          echo "$SONAR_TOKEN" > sonar_token
+          echo "test data" > test_data
+      
+      - name: upload test artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: test_data
+          path: test_data
+
+      - name: upload sonar
+        uses: actions/upload-artifact@v3
+        with:
+          name: sonar_token
+          path: sonar_token

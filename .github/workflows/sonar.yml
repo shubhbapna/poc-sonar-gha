@@ -1,0 +1,50 @@
+name: Sonar
+
+on:
+  workflow_run:
+    workflows: [PR check]
+    types:
+      - completed
+
+jobs:
+  download:
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Download artifact"
+        uses: actions/github-script@v6
+        with:
+          script: |
+            let allArtifacts = await github.rest.actions.listWorkflowRunArtifacts({
+               owner: context.repo.owner,
+               repo: context.repo.repo,
+               run_id: context.payload.workflow_run.id,
+            });
+            let matchArtifact = allArtifacts.data.artifacts.filter((artifact) => {
+              return artifact.name == "test_data"
+            })[0];
+            let download = await github.rest.actions.downloadArtifact({
+               owner: context.repo.owner,
+               repo: context.repo.repo,
+               artifact_id: matchArtifact.id,
+               archive_format: 'zip',
+            });
+            let fs = require('fs');
+            fs.writeFileSync(`${process.env.GITHUB_WORKSPACE}/test_data.zip`, Buffer.from(download.data));
+
+      - name: "Unzip artifact"
+        run: unzip test_data.zip
+
+      - name: "Use data"
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: |
+          echo "PR {{steps.set-pr.outputs.result}}"
+          echo "Sonar token should be accessible now"
+          echo "$SONAR_TOKEN" > sonar_token
+          cat test_data
+
+      - name: upload sonar
+        uses: actions/upload-artifact@v3
+        with:
+          name: sonar_token
+          path: sonar_token
