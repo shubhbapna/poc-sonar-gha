@@ -10,4 +10,4 @@ The `sonar` workflow is triggered whenever a `PR check` workflow runs successful
 
 To try it out, fork the repository and open a PR to increment the counter below
 
-counter = 2
+counter = 3
