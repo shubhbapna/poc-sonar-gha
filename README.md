@@ -1,3 +1,3 @@
 # PoC-sonar-gha  
 
-counter = 2
+counter = 3
