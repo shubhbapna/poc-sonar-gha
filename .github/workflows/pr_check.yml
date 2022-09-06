@@ -11,11 +11,12 @@ jobs:
       - name: Run test cases
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          PR_NUMBER: ${{ github.event.number }}
         run: |
           echo "Run test cases and produce files for sonar"
           echo "secrets cannot be accessed here by a PR from a forked Repo"
           echo "$SONAR_TOKEN" > sonar_token
-          echo "test data" > test_data
+          echo "test data from $PR_NUMBER" > test_data
       
       - name: upload test artifacts
         uses: actions/upload-artifact@v3
